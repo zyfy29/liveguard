@@ -1,11 +1,6 @@
 name: Build and Push to Docker Hub
 
 on:
-  push:
-    branches:
-      - main  # mainブランチが更新されたときに実行
-    paths-ignore:
-      - 'readme.md'
   pull_request:
     branches:
       - main
