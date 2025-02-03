@@ -1,0 +1,35 @@
+name: Build and Push to Docker Hub
+
+on:
+  push:
+    branches:
+      - main  # mainブランチが更新されたときに実行
+    paths-ignore:
+      - 'readme.md'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - 'readme.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./back         # Dockerのビルドコンテキストをbackディレクトリに指定
+          file: ./back/Dockerfile   # 使用するDockerfileのパス
+          push: true
+          tags: tdzz1102/liveguard-back:latest
