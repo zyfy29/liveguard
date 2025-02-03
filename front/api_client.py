@@ -1,0 +1,30 @@
+import requests
+
+from config import settings
+
+base_url = f'http://127.0.0.1:{settings.app.back_port}'
+
+
+def get_lives(owner_id, next_time=0):
+    params = {
+        'owner_id': owner_id
+    }
+    if next_time:
+        params['next_time'] = next_time
+    res = requests.get(f'{base_url}/pocket/live', params=params)
+    data = res.json()
+    return data['data']['lives'], data['data']['next_time']
+
+
+def create_task(live_id):
+    res = requests.post(f'{base_url}/task', json={'live_id': live_id})
+    return res.json()
+
+def retry_tasks():
+    res = requests.post(f'{base_url}/task/retry')
+    return res.json()
+
+
+def get_members():
+    res = requests.get(f'{base_url}/pocket/member')
+    return res.json()['data']
