@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  back:
+    image: zuoyoufengyuan/liveguard-back:latest
+    restart: unless-stopped
+    ports:
+      - "${BACK_PORT}:2079"    # 必要に応じて追加
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./liveguard.db:/app/liveguard.db   # SQLite DB ファイル（あれば）
+
+  front:
+    image: zuoyoufengyuan/liveguard-front:latest
+    depends_on:
+      - back
+    restart: unless-stopped
+    ports:
+      - "${FRONT_PORT}:8501"
+    environment:
+      - DYNACONF_API_ADDR=back
+      - DYNACONF_API_PORT=2079
