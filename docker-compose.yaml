@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   back:
     image: zuoyoufengyuan/liveguard-back:latest
@@ -18,5 +16,5 @@ services:
     ports:
       - "${FRONT_PORT}:8501"
     environment:
-      - DYNACONF_API_ADDR=back
+      - DYNACONF_API_HOST=back
       - DYNACONF_API_PORT=2079
