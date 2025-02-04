@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'back/**'
+  workflow_dispatch:
 
 jobs:
   build-back:
