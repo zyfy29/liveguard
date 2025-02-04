@@ -1,8 +1,10 @@
 import requests
 
-from config import settings
+from front.config import settings
 
-base_url = f'http://127.0.0.1:{settings.app.back_port}'
+
+# DYNACONF_API_HOST, DYNACONF_API_HOST
+base_url = f'http://{settings.api_host}:{settings.api_port}'
 
 
 def get_lives(owner_id, next_time=0):
@@ -27,4 +29,9 @@ def retry_tasks():
 
 def get_members():
     res = requests.get(f'{base_url}/pocket/member')
+    return res.json()['data']
+
+
+def get_tasks():
+    res = requests.get(f'{base_url}/task/')
     return res.json()['data']
