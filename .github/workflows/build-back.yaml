@@ -28,4 +28,4 @@ jobs:
           context: ./back
           file: ./back/Dockerfile
           push: true
-          tags: tdzz1102/liveguard-back:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/liveguard-back:latest
