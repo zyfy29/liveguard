@@ -1,14 +1,16 @@
-name: Build and Push to Docker Hub
+name: Build and Push Backend to Docker Hub
 
 on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'back/**'
     paths-ignore:
       - 'readme.md'
 
 jobs:
-  build:
+  build-back:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,10 +23,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (back)
         uses: docker/build-push-action@v5
         with:
-          context: ./back         # Dockerのビルドコンテキストをbackディレクトリに指定
-          file: ./back/Dockerfile   # 使用するDockerfileのパス
+          context: ./back
+          file: ./back/Dockerfile
           push: true
           tags: tdzz1102/liveguard-back:latest
