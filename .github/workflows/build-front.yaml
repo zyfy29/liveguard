@@ -6,8 +6,6 @@ on:
       - main
     paths:
       - 'front/**'
-    paths-ignore:
-      - 'readme.md'
 
 jobs:
   build-front:

@@ -6,8 +6,6 @@ on:
       - main
     paths:
       - 'back/**'
-    paths-ignore:
-      - 'readme.md'
 
 jobs:
   build-back:
