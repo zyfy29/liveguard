@@ -289,39 +289,46 @@ func TestCreateLiveTask(t *testing.T) {
 func Test_restoreFailedTasks(t *testing.T) {
 	p := gomonkey.NewPatches()
 	defer p.Reset()
-	p.ApplyFunc(GetDBTaskByStatus, func(status string, limit int) ([]Task, error) {
-		return []Task{
-			// 投稿失敗のタスク
-			{
-				ID: 1,
-				Details: cm.JsonMarshal(
-					TaskDetail{
-						Transcript: "123",
-						Summary:    "456",
-					},
-				),
-			},
-			{
-				ID: 2,
-				Details: cm.JsonMarshal(
-					TaskDetail{
-						TranscriptID: "789",
-					},
-				),
-			},
-			{
-				ID: 3,
-				Details: cm.JsonMarshal(
-					TaskDetail{
-						FilePath: "abc",
-					},
-				),
-			},
-			{
-				ID:      101,
-				Details: `{"owner_id":"538697","file_path":"/root/bearguard/data/live-c3ad8474-5be4-4939-ad16-24c8925ca653.mp3","transcript_id":"","transcript":"","summary":"","post_url":"https://medium.com/@wasuremono127/%E6%B2%88%E5%B0%8F%E7%88%B1-2024-08-31-%E6%9D%A5%E5%95%A6-75f259365975"}`,
-			},
-		}, nil
+	tasks := []Task{
+		// 投稿失敗のタスク
+		{
+			ID: 1,
+			Details: cm.JsonMarshal(
+				TaskDetail{
+					Transcript: "123",
+					Summary:    "456",
+				},
+			),
+		},
+		{
+			ID: 2,
+			Details: cm.JsonMarshal(
+				TaskDetail{
+					TranscriptID: "789",
+				},
+			),
+		},
+		{
+			ID: 3,
+			Details: cm.JsonMarshal(
+				TaskDetail{
+					FilePath: "abc",
+				},
+			),
+		},
+		{
+			ID:      101,
+			Details: `{"owner_id":"538697","file_path":"/root/bearguard/data/live-c3ad8474-5be4-4939-ad16-24c8925ca653.mp3","transcript_id":"","transcript":"","summary":"","post_url":"https://medium.com/@wasuremono127/%E6%B2%88%E5%B0%8F%E7%88%B1-2024-08-31-%E6%9D%A5%E5%95%A6-75f259365975"}`,
+		},
+	}
+
+	p.ApplyFunc(GetDBTaskByID, func(id int64) (Task, error) {
+		for _, task := range tasks {
+			if task.ID == id {
+				return task, nil
+			}
+		}
+		panic("no such task")
 	})
 	p.ApplyFunc(UpdateDBTaskStatus, func(id int64, status string) error {
 		switch int(id) {
@@ -336,7 +343,11 @@ func Test_restoreFailedTasks(t *testing.T) {
 		}
 		return nil
 	})
-	RestoreFailedTasks()
+
+	for _, task := range tasks {
+		err := RestoreTask(task.ID)
+		assert.NoError(t, err)
+	}
 }
 
 func TestGetDBTaskByID(t *testing.T) {

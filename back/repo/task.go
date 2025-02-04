@@ -180,24 +180,30 @@ func CreateLiveTask(id string) (err error) {
 	return
 }
 
-func RestoreTasks() error {
-	if err := RestoreDownloadingTasks(); err != nil {
-		return err
-	}
-	if err := RestoreFailedTasks(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func RestoreDownloadingTasks() error {
-	tasks, err := GetDBTaskByStatus(TaskStatusDownloading, 0)
+func RestoreTask(id int64) error {
+	task, err := GetDBTaskByID(id)
 	if err != nil {
-		return errors.Wrap(err, "Failed to get tasks")
+		return errors.Wrapf(err, "Failed to get task by id: %d", id)
 	}
 
-	for _, task := range tasks {
+	// downloading -> pending
+	if task.Status == TaskStatusDownloading {
 		if err := UpdateDBTaskStatus(task.ID, TaskStatusPending); err != nil {
+			return errors.Wrap(err, "Failed to update live status")
+		}
+	}
+
+	// failed, check detail
+	var detail TaskDetail
+	if err = json.Unmarshal([]byte(task.Details), &detail); err != nil {
+		return errors.Wrap(err, "Failed to unmarshal task details")
+	}
+	if detail.Transcript != "" && detail.Summary != "" {
+		// 投稿失敗の場合は自動的に再試行するので、スキップ
+		return nil
+	} else if detail.TranscriptID != "" || detail.FilePath != "" {
+		// ダウンロード成功の場合、transcriptを試行
+		if err := UpdateDBTaskStatus(task.ID, TaskStatusAwaitTranscript); err != nil {
 			return errors.Wrap(err, "Failed to update live status")
 		}
 	}

@@ -29,3 +29,6 @@ def live_page():
                     count += 1
     if count > 0:
         st.success(f'{count} tasks created')
+
+
+live_page()

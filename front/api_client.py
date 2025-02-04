@@ -22,8 +22,8 @@ def create_task(live_id):
     res = requests.post(f'{base_url}/task', json={'live_id': live_id})
     return res.json()
 
-def retry_tasks():
-    res = requests.post(f'{base_url}/task/retry')
+def retry_task(task_id):
+    res = requests.post(f'{base_url}/task/retry', json={'task_id': task_id})
     return res.json()
 
 
