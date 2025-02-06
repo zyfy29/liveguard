@@ -1,12 +1,10 @@
 package pocket
 
 import (
-	"bearguard/cm"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -88,7 +86,6 @@ func (f formatter[T]) doRestWithResult(method, url string, req any) (t T, err er
 	if err = json.Unmarshal(body, resp); err != nil {
 		return
 	}
-	log.Println(cm.JsonMarshal(resp))
 	if !resp.Success {
 		err = fmt.Errorf("request failed with code %d, message: %s", resp.Status, resp.Message)
 		return

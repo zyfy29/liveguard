@@ -7,6 +7,11 @@ import (
 	"testing"
 )
 
+func Test_getMyName(t *testing.T) {
+	req, _ := http.NewRequest(http.MethodGet, "/pocket/me", nil)
+	testRequest(t, req)
+}
+
 func Test_getMembers(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodGet, "/pocket/member", nil)
 	testRequest(t, req)
