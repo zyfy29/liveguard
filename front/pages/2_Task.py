@@ -6,7 +6,7 @@ from front.api_client import delete_task, get_tasks, retry_task
 def task_page():
     st.set_page_config(layout='wide')
     st.title('Summarize Tasks')
-    tasks = get_tasks()
+    tasks = get_tasks()['data']
     for task in tasks:
         task['live_time'] = task['live_time']['Time']
         task['updated'] = task['updated']['Time']

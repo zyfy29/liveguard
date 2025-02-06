@@ -13,7 +13,7 @@ import (
 
 func WatchTaskAndCallLLM() {
 	for {
-		tasks, err := repo.GetDBTaskByStatus(repo.TaskStatusAwaitTranscript, 10)
+		tasks, err := repo.GetDBTasksByStatus(repo.TaskStatusAwaitTranscript, 10)
 		if err != nil {
 			log.Printf("Failed to get tasks: %v", err)
 		}

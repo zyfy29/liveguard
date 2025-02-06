@@ -73,9 +73,9 @@ func GetDBTaskByLiveID(liveID string) (Task, error) {
 	return task, err
 }
 
-func GetDBTaskByStatus(status string, limit int) ([]Task, error) {
+func GetDBTasksByStatus(status string, limit int) ([]Task, error) {
 	tasks := []Task{}
-	query := `SELECT * FROM task WHERE status = $1 ORDER BY created`
+	query := `SELECT * FROM task WHERE status = $1 ORDER BY id desc`
 	if limit > 0 {
 		query += fmt.Sprintf(" LIMIT %d", limit)
 	}
@@ -211,7 +211,7 @@ func RestoreTask(id int64) error {
 }
 
 func RestoreFailedTasks() error {
-	tasks, err := GetDBTaskByStatus(TaskStatusFailed, 0)
+	tasks, err := GetDBTasksByStatus(TaskStatusFailed, 0)
 	if err != nil {
 		return errors.Wrap(err, "Failed to get tasks")
 	}

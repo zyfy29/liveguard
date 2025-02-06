@@ -17,7 +17,14 @@ func setTaskRoutes(r *gin.Engine) {
 }
 
 func getTasks(c *gin.Context) {
-	tasks, err := repo.GetDBTasks()
+	taskStatus := c.Query("status")
+	var tasks []repo.Task
+	var err error
+	if len(taskStatus) == 0 {
+		tasks, err = repo.GetDBTasks()
+	} else {
+		tasks, err = repo.GetDBTasksByStatus(taskStatus, 0)
+	}
 	if err != nil {
 		ResponseServerError(c, err)
 		return

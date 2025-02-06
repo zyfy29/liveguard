@@ -37,6 +37,11 @@ def get_members():
     return res.json()['data']
 
 
-def get_tasks():
-    res = requests.get(f'{base_url}/task/')
-    return res.json()['data']
+def get_tasks(status=''):
+    res = requests.get(f'{base_url}/task', params={'status': status})
+    return res.json()
+
+
+def get_task_detail(task_id):
+    res = requests.get(f'{base_url}/task/{task_id}')
+    return res.json()
