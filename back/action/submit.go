@@ -14,7 +14,7 @@ import (
 
 func WatchAndSubmitToMedium() {
 	for {
-		tasks, err := repo.GetDBTaskByStatus(repo.TaskStatusAwaitSubmit, 10)
+		tasks, err := repo.GetDBTasksByStatus(repo.TaskStatusAwaitSubmit, 10)
 		if err != nil {
 			log.Printf("Failed to get tasks: %v", err)
 		}
@@ -65,7 +65,7 @@ func doSubmit(task repo.Task) (err error) {
 
 func WatchAndRetrySubmit() {
 	for {
-		tasks, err := repo.GetDBTaskByStatus(repo.TaskStatusFailed, 10)
+		tasks, err := repo.GetDBTasksByStatus(repo.TaskStatusFailed, 10)
 		if err != nil {
 			log.Printf("Failed to get tasks: %v", err)
 		}

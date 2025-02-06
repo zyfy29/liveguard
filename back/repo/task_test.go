@@ -71,6 +71,14 @@ func TestGetDBTaskByStatus(t *testing.T) {
 			},
 			wantErr: assert.NoError,
 		},
+		{
+			name: "Get succeeded tasks",
+			args: args{
+				status: "succeed",
+				limit:  0,
+			},
+			wantErr: assert.NoError,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -78,9 +86,9 @@ func TestGetDBTaskByStatus(t *testing.T) {
 				Status: "Test Pending",
 				LiveID: uuid.NewString(),
 			})
-			got, err := GetDBTaskByStatus(tt.args.status, tt.args.limit)
+			got, err := GetDBTasksByStatus(tt.args.status, tt.args.limit)
 			t.Logf("Got %d tasks with status %s", len(got), tt.args.status)
-			if !tt.wantErr(t, err, fmt.Sprintf("GetDBTaskByStatus(%v, %v)", tt.args.status, tt.args.limit)) {
+			if !tt.wantErr(t, err, fmt.Sprintf("GetDBTasksByStatus(%v, %v)", tt.args.status, tt.args.limit)) {
 				return
 			}
 		})

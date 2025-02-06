@@ -13,7 +13,7 @@ import (
 
 func WatchTaskAndDownloadLive() {
 	for {
-		tasks, err := repo.GetDBTaskByStatus(repo.TaskStatusPending, 10)
+		tasks, err := repo.GetDBTasksByStatus(repo.TaskStatusPending, 10)
 		if err != nil {
 			log.Printf("Failed to get tasks: %v", err)
 		}
