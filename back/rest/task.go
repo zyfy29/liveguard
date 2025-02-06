@@ -10,6 +10,7 @@ import (
 func setTaskRoutes(r *gin.Engine) {
 	g := r.Group("/task")
 	g.GET("/", getTasks)
+	g.DELETE("/:id", deleteTask)
 	g.GET("/:id", getTaskDetail)
 	g.POST("/", createTask)
 	g.POST("/retry", restoreTask)
@@ -22,6 +23,15 @@ func getTasks(c *gin.Context) {
 		return
 	}
 	ResponseOk(c, tasks)
+}
+
+func deleteTask(c *gin.Context) {
+	taskPk, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err := repo.DeleteDBTask(taskPk); err != nil {
+		ResponseServerError(c, err)
+		return
+	}
+	ResponseOk(c, nil)
 }
 
 type taskAndDetail struct {

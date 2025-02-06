@@ -1,9 +1,10 @@
 import streamlit as st
 
-from front.api_client import get_tasks, retry_task
+from front.api_client import delete_task, get_tasks, retry_task
 
 
 def task_page():
+    st.set_page_config(layout='wide')
     st.title('Summarize Tasks')
     tasks = get_tasks()
     for task in tasks:
@@ -14,14 +15,23 @@ def task_page():
     edited_task_dicts = st.data_editor(tasks)
 
     count = 0
-    if st.button('Restore'):
-        for task in edited_task_dicts:
-            if task['select']:
-                res = retry_task(task['id'])
-                if res.get('code') == 0:
-                    count += 1
+    col1, col2, _ = st.columns(3)
+    with col1:
+        if st.button('Restore'):
+            for task in edited_task_dicts:
+                if task['select']:
+                    res = retry_task(task['id'])
+                    if res.get('code') == 0:
+                        count += 1
+    with col2:
+        if st.button('Delete'):
+            for task in edited_task_dicts:
+                if task['select']:
+                    res = delete_task(task['id'])
+                    if res.get('code') == 0:
+                        count += 1
     if count > 0:
-        st.success(f'{count} tasks restored')
+        st.success(f'{count} tasks affected.')
 
 
 task_page()
