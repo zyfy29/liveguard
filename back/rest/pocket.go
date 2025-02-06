@@ -10,9 +10,21 @@ import (
 
 func setPocketRoutes(r *gin.Engine) {
 	g := r.Group("/pocket")
+	g.GET("me", getMyName)
 	g.GET("/member", getMembers)
 	g.GET("/live", getLivesByMember)
 	g.GET("/live/duration", getLiveDuration)
+}
+
+func getMyName(c *gin.Context) {
+	myName, err := pocket.GetClient().ValidateToken()
+	if err != nil {
+		ResponseServerError(c, err)
+		return
+	}
+	ResponseOk(c, gin.H{
+		"nickname": myName,
+	})
 }
 
 // name and member_id only

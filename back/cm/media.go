@@ -15,7 +15,7 @@ import (
 	"time"
 )
 
-const maxRetry = 5
+const maxRetry = 6
 
 func parsePlaylist(playlistUrl string) (*m3u8.MediaPlaylist, error) {
 	resp, err := http.Get(playlistUrl)
