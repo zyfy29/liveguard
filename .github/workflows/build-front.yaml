@@ -9,11 +9,13 @@ on:
       - main
     paths:
       - 'front/**'
+      - '.github/workflows/build-front.yaml'
   push:
     branches:
       - main
     paths:
       - 'front/**'
+      - '.github/workflows/build-front.yaml'
   workflow_dispatch:
 
 jobs:
