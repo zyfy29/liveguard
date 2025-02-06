@@ -9,9 +9,13 @@ on:
       - main
     paths:
       - 'back/**'
+      - '.github/workflows/build-back.yaml'
   push:
     branches:
       - main
+    paths:
+      - 'back/**'
+      - '.github/workflows/build-back.yaml'
   workflow_dispatch:
 
 jobs:
