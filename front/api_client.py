@@ -45,3 +45,8 @@ def get_tasks(status=''):
 def get_task_detail(task_id):
     res = requests.get(f'{base_url}/task/{task_id}')
     return res.json()
+
+
+def get_my_name():
+    res = requests.get(f'{base_url}/pocket/me')
+    return res.json()
