@@ -2,10 +2,20 @@ name: Build and Push Backend to Docker Hub
 
 on:
   pull_request:
+    types:
+      - opened
+      - synchronize
     branches:
       - main
     paths:
       - 'back/**'
+      - '.github/workflows/build-back.yaml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'back/**'
+      - '.github/workflows/build-back.yaml'
   workflow_dispatch:
 
 jobs:
@@ -22,10 +32,39 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image (back)
+      - name: Set image tag
+        id: vars
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "TAG=${{ secrets.DOCKERHUB_USERNAME }}/liveguard-back:pr-${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          else
+            echo "TAG=${{ secrets.DOCKERHUB_USERNAME }}/liveguard-back:latest" >> $GITHUB_ENV
+          fi
+
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./back
           file: ./back/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/liveguard-back:latest
+          tags: ${{ env.TAG }}
+
+  tag-latest:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: build-back
+
+    steps:
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Pull PR image and tag as latest
+        run: |
+          PR_NUMBER=$(gh pr list --state merged --limit 1 --json number --jq '.[0].number')
+          IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/liveguard-back
+          docker pull $IMAGE:pr-$PR_NUMBER
+          docker tag $IMAGE:pr-$PR_NUMBER $IMAGE:latest
+          docker push $IMAGE:latest
