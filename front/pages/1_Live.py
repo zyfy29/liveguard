@@ -1,9 +1,10 @@
 import streamlit as st
 
-from front.api_client import get_members, get_lives, create_task
+from front.api_client import create_task, get_lives, get_members
 
 
 def live_page():
+    st.set_page_config(layout='wide')
     st.title('Live History')
     members = get_members()
     member = st.selectbox(

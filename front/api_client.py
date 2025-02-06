@@ -2,7 +2,6 @@ import requests
 
 from front.config import settings
 
-
 # DYNACONF_API_HOST, DYNACONF_API_HOST
 base_url = f'http://{settings.api_host}:{settings.api_port}'
 
@@ -22,8 +21,14 @@ def create_task(live_id):
     res = requests.post(f'{base_url}/task', json={'live_id': live_id})
     return res.json()
 
+
 def retry_task(task_id):
     res = requests.post(f'{base_url}/task/retry', json={'task_id': task_id})
+    return res.json()
+
+
+def delete_task(task_id):
+    res = requests.delete(f'{base_url}/task/{task_id}')
     return res.json()
 
 
