@@ -63,6 +63,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Pull PR image and tag as latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER=$(gh pr list --state merged --limit 1 --json number --jq '.[0].number')
           IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/liveguard-back
