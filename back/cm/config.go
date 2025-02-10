@@ -11,13 +11,12 @@ import (
 type Config struct {
 	Pocket PocketConfig `json:"pocket"`
 	AAI    AAIConfig    `json:"aai"`
-	Medium MediumConfig `json:"medium"`
+	//Medium MediumConfig `json:"medium"`
 }
 
 type PocketConfig struct {
 	Token    string `json:"token"`
 	AppInfo  string `mapstructure:"app_info" json:"app_info"`
-	Pa       string `json:"pa"`
 	Interval int    `json:"interval"`
 }
 

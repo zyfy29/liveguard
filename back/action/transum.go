@@ -67,7 +67,8 @@ func doTranscriptAndSummarize(task repo.Task) (err error) {
 	}
 	detail.Summary = summary
 
-	if err = repo.UpdateDBTaskStatusAndDetails(task.ID, repo.TaskStatusAwaitSubmit, cm.JsonMarshal(detail)); err != nil {
+	// changed from repo.TaskStatusAwaitSubmit
+	if err = repo.UpdateDBTaskStatusAndDetails(task.ID, repo.TaskStatusSucceed, cm.JsonMarshal(detail)); err != nil {
 		return errors.Wrap(err, "failed to update task status and details")
 	}
 	return
