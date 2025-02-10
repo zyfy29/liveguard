@@ -4,8 +4,16 @@ app:
 
 pocket:
   token: <token>
-  app_info: '{"vendor":"apple","deviceId":"F9751B64-E90D-62EA-6303-F278CE6AFE27","appVersion":"7.1.12","appBuild":"24061501","osVersion":"17.1.1","osType":"ios","deviceName":"iPhone 12 mini","os":"ios"}'
   interval: 500
+  app_info:
+    vendor: apple
+    deviceId:
+    appVersion: 7.1.12
+    appBuild: 24061501
+    osVersion: 17.1.1
+    osType: ios
+    deviceName: iPhone 12 mini
+    os: ios
 
 aai:
   token: <token>
