@@ -25,7 +25,7 @@ jobs:
       - name: Copy deploy files
         run: |
           mkdir deploy_files
-          cp docker-compose.yaml back/config.example.yaml .example.env deploy_files/ # match 'paths' defined above
+          cp docker-compose.yaml back/config.example.yaml '.example.env' deploy_files/ # match 'paths' defined above
 
       - name: Clone deploy repository
         run: git clone -b "${{ env.REPO_NAME }}" https://github.com/${{ github.repository_owner }}/deploy.git
@@ -38,5 +38,5 @@ jobs:
           git config user.email "actions@github.com"
           git remote set-url origin https://x-access-token:${{ secrets.DEPLOY_PAT }}@github.com/${{ github.repository_owner }}/deploy.git
           git add .
-          git commit -m "Update encrypted deploy files" || echo "No changes to commit"
+          git commit -m "Update deploy files" || echo "No changes to commit"
           git push origin "${{ env.REPO_NAME }}"
