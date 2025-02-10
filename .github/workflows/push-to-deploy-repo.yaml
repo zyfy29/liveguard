@@ -25,7 +25,8 @@ jobs:
       - name: Copy deploy files
         run: |
           mkdir deploy_files
-          cp docker-compose.yaml back/config.example.yaml '.example.env' deploy_files/ # match 'paths' defined above
+          ls -a
+          cp docker-compose.yaml back/config.example.yaml ./.example.env deploy_files/ # match 'paths' defined above
 
       - name: Clone deploy repository
         run: git clone -b "${{ env.REPO_NAME }}" https://github.com/${{ github.repository_owner }}/deploy.git
