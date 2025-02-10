@@ -10,7 +10,7 @@ def task_page():
     for task in tasks:
         task['live_time'] = task['live_time']['Time']
         task['updated'] = task['updated']['Time']
-        task['error_info'] = task['info']
+        task['info'] = task['error_info']
         del task['error_info']
         task['select'] = False
 
