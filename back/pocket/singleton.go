@@ -17,7 +17,7 @@ func GetClient() *Client {
 		if instance == nil {
 			instance = newClient(
 				viper.GetString("pocket.token"),
-				viper.GetString("pocket.app_info"),
+				viper.GetStringMapString("pocket.app_info"),
 				viper.GetInt("pocket.interval"),
 			)
 		}

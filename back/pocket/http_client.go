@@ -1,11 +1,14 @@
 package pocket
 
 import (
+	"bearguard/cm"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"io"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -20,13 +23,14 @@ type Client struct {
 	interval int
 }
 
-func newClient(token, appInfo string, interval int) *Client {
+func newClient(token string, appInfo map[string]string, interval int) *Client {
+	appInfo["deviceId"] = strings.ToUpper(uuid.NewString())
 	c := Client{
 		mu:           sync.Mutex{},
 		lastCallTime: time.Time{},
 		rateLimit:    0,
 		token:        token,
-		appInfo:      appInfo,
+		appInfo:      cm.JsonMarshal(appInfo),
 		interval:     interval,
 	}
 	return &c

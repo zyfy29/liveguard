@@ -15,9 +15,20 @@ type Config struct {
 }
 
 type PocketConfig struct {
-	Token    string `json:"token"`
-	AppInfo  string `mapstructure:"app_info" json:"app_info"`
-	Interval int    `json:"interval"`
+	Token    string        `json:"token"`
+	AppInfo  PocketAppInfo `mapstructure:"app_info" json:"app_info"`
+	Interval int           `json:"interval"`
+}
+
+type PocketAppInfo struct {
+	Vendor     string `json:"vendor"`
+	DeviceId   string `json:"deviceId"`
+	AppVersion string `json:"appVersion"`
+	AppBuild   string `json:"appBuild"`
+	OsVersion  string `json:"osVersion"`
+	OsType     string `json:"osType"`
+	DeviceName string `json:"deviceName"`
+	Os         string `json:"os"`
 }
 
 type AAIConfig struct {
