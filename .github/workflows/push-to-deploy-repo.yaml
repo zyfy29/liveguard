@@ -1,0 +1,42 @@
+name: Push to Deploy Repo
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/push-to-deploy-repo.yaml'
+      - 'docker-compose.yaml'
+      - 'back/config.example.yaml'
+      - '.env.example'
+  workflow_dispatch:
+
+jobs:
+  encrypt_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+
+      - name: Get repository name
+        id: repo_name
+        run: echo "REPO_NAME=${{ github.event.repository.name }}" >> $GITHUB_ENV
+
+      - name: Copy deploy files
+        run: |
+          mkdir deploy_files
+          cp docker-compose.yaml back/config.example.yaml .env.example deploy_files/ # match 'paths' defined above
+
+      - name: Clone deploy repository
+        run: git clone -b "${{ env.REPO_NAME }}" https://github.com/${{ github.repository_owner }}/deploy.git
+
+      - name: Push encrypted files to deploy repo
+        run: |
+          cd deploy
+          cp -r ../deploy_files/* .
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.DEPLOY_PAT }}@github.com/${{ github.repository_owner }}/deploy.git
+          git add .
+          git commit -m "Update encrypted deploy files" || echo "No changes to commit"
+          git push origin "${{ env.REPO_NAME }}"
