@@ -8,7 +8,7 @@ on:
       - '.github/workflows/push-to-deploy-repo.yaml'
       - 'docker-compose.yaml'
       - 'back/config.example.yaml'
-      - '.env.example'
+      - '.example.env'
   workflow_dispatch:
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
       - name: Copy deploy files
         run: |
           mkdir deploy_files
-          cp docker-compose.yaml back/config.example.yaml .env.example deploy_files/ # match 'paths' defined above
+          cp docker-compose.yaml back/config.example.yaml .example.env deploy_files/ # match 'paths' defined above
 
       - name: Clone deploy repository
         run: git clone -b "${{ env.REPO_NAME }}" https://github.com/${{ github.repository_owner }}/deploy.git
