@@ -38,58 +38,86 @@ func parsePlaylist(playlistUrl string) (*m3u8.MediaPlaylist, error) {
 	return mediaPlaylist, nil
 }
 
+type DownloadResult struct {
+	FilePath string
+	Err      error
+}
+
 // DownloadPlaylistAudio download the video of given playlist to ./data/live-{uuid}.mp3
-func DownloadPlaylistAudio(playlistUrl string) (string, error) {
-	tmpTsDir, err := os.MkdirTemp("", "live-*.d")
-	if err != nil {
-		return "", err
-	}
-	defer os.RemoveAll(tmpTsDir)
+func DownloadPlaylistAudio(playlistUrl string) (<-chan int, <-chan DownloadResult) {
+	progressChan := make(chan int, 1)
+	resultChan := make(chan DownloadResult, 1)
 
-	mediaPlaylist, err := parsePlaylist(playlistUrl)
-	if err != nil {
-		return "", err
-	}
+	go func() {
+		defer close(progressChan)
+		defer close(resultChan)
 
-	parsedURL, err := url.Parse(playlistUrl)
-	if err != nil {
-		return "", err
-	}
-	baseURL := fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
-
-	// download ts files to custom tmp dir
-	var tsFiles []string
-	retries := make(map[int]int)
-	for i, segment := range mediaPlaylist.Segments {
-		if segment == nil {
-			continue
+		tmpTsDir, err := os.MkdirTemp("", "live-*.d")
+		if err != nil {
+			resultChan <- DownloadResult{Err: err}
+			return
 		}
-		tsFile := filepath.Join(tmpTsDir, filepath.Base(segment.URI))
-		if err := downloadFile(lo.Must(url.JoinPath(baseURL, segment.URI)), tsFile); err != nil {
-			for retries[i] < maxRetry || err != nil {
-				log.Printf("Retrying download for segment %d", i)
-				retries[i]++
-				time.Sleep(time.Duration(retries[i]) * 3 * time.Second)
-				err = downloadFile(lo.Must(url.JoinPath(baseURL, segment.URI)), tsFile)
-			}
-			if err != nil {
-				return "", errors.Wrapf(err, "max retries exceeded for segment %d", i)
-			}
+		defer os.RemoveAll(tmpTsDir)
+
+		mediaPlaylist, err := parsePlaylist(playlistUrl)
+		if err != nil {
+			resultChan <- DownloadResult{Err: err}
+			return
 		}
-		tsFiles = append(tsFiles, tsFile)
-	}
 
-	tmpMP3, err := mergeTSToMP3(tsFiles)
-	if err != nil {
-		return "", err
-	}
-	defer os.Remove(tmpMP3)
+		parsedURL, err := url.Parse(playlistUrl)
+		if err != nil {
+			resultChan <- DownloadResult{Err: err}
+			return
+		}
+		baseURL := fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
 
-	targetFile := GetRandomDataFilePathWithNameAndExt("live", "mp3")
-	if err := copyFile(tmpMP3, targetFile); err != nil {
-		return "", err
-	}
-	return targetFile, nil
+		var tsFiles []string
+		retries := make(map[int]int)
+		totalSegments := len(mediaPlaylist.Segments)
+
+		progressChan <- totalSegments
+		for i, segment := range mediaPlaylist.Segments {
+			progressChan <- i
+			if segment == nil {
+				continue
+			}
+			tsFile := filepath.Join(tmpTsDir, filepath.Base(segment.URI))
+			if err := downloadFile(lo.Must(url.JoinPath(baseURL, segment.URI)), tsFile); err != nil {
+				for retries[i] < maxRetry {
+					log.Printf("Retrying download for segment %d", i)
+					retries[i]++
+					time.Sleep(10 * time.Second)
+					err = downloadFile(lo.Must(url.JoinPath(baseURL, segment.URI)), tsFile)
+					if err == nil {
+						break
+					}
+				}
+				if err != nil {
+					resultChan <- DownloadResult{Err: errors.Wrapf(err, "max retries exceeded for segment %d", i)}
+					return
+				}
+			}
+			tsFiles = append(tsFiles, tsFile)
+		}
+
+		tmpMP3, err := mergeTSToMP3(tsFiles)
+		if err != nil {
+			resultChan <- DownloadResult{Err: err}
+			return
+		}
+		defer os.Remove(tmpMP3)
+
+		targetFile := GetRandomDataFilePathWithNameAndExt("live", "mp3")
+		if err := copyFile(tmpMP3, targetFile); err != nil {
+			resultChan <- DownloadResult{Err: err}
+			return
+		}
+
+		resultChan <- DownloadResult{FilePath: targetFile}
+	}()
+
+	return progressChan, resultChan
 }
 
 // mergeTSToMP3 merge tsFiles to a tmp mp3 file

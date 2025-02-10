@@ -10,6 +10,8 @@ def task_page():
     for task in tasks:
         task['live_time'] = task['live_time']['Time']
         task['updated'] = task['updated']['Time']
+        task['error_info'] = task['info']
+        del task['error_info']
         task['select'] = False
 
     edited_task_dicts = st.data_editor(tasks)

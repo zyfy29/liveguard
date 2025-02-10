@@ -34,7 +34,6 @@ func TestDownloadLiveAndConvertToAudio(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    string
 		wantErr assert.ErrorAssertionFunc
 	}{
 		{
@@ -47,11 +46,21 @@ func TestDownloadLiveAndConvertToAudio(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := DownloadPlaylistAudio(tt.args.playListUrl)
-			if !tt.wantErr(t, err, fmt.Sprintf("DownloadPlaylistAudio(%v)", tt.args.playListUrl)) {
+			progressChan, resultChan := DownloadPlaylistAudio(tt.args.playListUrl)
+
+			// 進捗表示（テスト中はログ出力のみ）
+			go func() {
+				for progress := range progressChan {
+					t.Logf("Progress: %d%%", progress)
+				}
+			}()
+
+			// 結果待ち
+			result := <-resultChan
+			if !tt.wantErr(t, result.Err, fmt.Sprintf("DownloadPlaylistAudio(%v)", tt.args.playListUrl)) {
 				return
 			}
-			t.Log(got)
+			t.Log("Downloaded file:", result.FilePath)
 		})
 	}
 }

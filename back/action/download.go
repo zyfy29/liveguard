@@ -5,6 +5,7 @@ import (
 	"bearguard/pocket"
 	"bearguard/repo"
 	"encoding/json"
+	"fmt"
 	"github.com/pkg/errors"
 	"log"
 	"strings"
@@ -38,7 +39,6 @@ func doDownloadLive(task repo.Task) (err error) {
 		return errors.Wrap(err, "failed to get live info")
 	}
 	if liveInfo.LiveId == "" || strings.HasPrefix(liveInfo.PlayStreamPath, "rtmp") {
-		// liveまだ生成されていない
 		return
 	}
 
@@ -46,20 +46,39 @@ func doDownloadLive(task repo.Task) (err error) {
 		return errors.Wrap(err, "failed to update task status")
 	}
 
-	liveAudio, err := cm.DownloadPlaylistAudio(liveInfo.PlayStreamPath)
-	if err != nil {
-		return errors.Wrap(err, "failed to download live and convert to audio")
-	}
-	log.Printf("Live audio merged to %s", liveAudio)
+	// 非同期でダウンロード開始
+	progressChan, resultChan := cm.DownloadPlaylistAudio(liveInfo.PlayStreamPath)
+	totalSegments := -1
 
-	var detail repo.TaskDetail
-	if err = json.Unmarshal([]byte(task.Details), &detail); err != nil {
-		return errors.Wrap(err, "failed to unmarshal task details")
-	}
-	detail.FilePath = liveAudio
+	// 進捗監視
+	for progressChan != nil || resultChan != nil {
+		select {
+		case progress := <-progressChan:
+			if totalSegments == -1 {
+				totalSegments = progress
+			} else {
+				_ = repo.UpdateDBTaskErrorInfo(task.ID, fmt.Sprintf("%d/%d", progress, totalSegments))
+			}
 
-	if err = repo.UpdateDBTaskStatusAndDetails(task.ID, repo.TaskStatusAwaitTranscript, cm.JsonMarshal(detail)); err != nil {
-		return errors.Wrap(err, "failed to update task status and details")
+		case result := <-resultChan:
+			if result.Err != nil {
+				return errors.Wrap(result.Err, "failed to download live and convert to audio")
+			}
+
+			log.Printf("Live audio merged to %s", result.FilePath)
+
+			var detail repo.TaskDetail
+			if err := json.Unmarshal([]byte(task.Details), &detail); err != nil {
+				return errors.Wrap(err, "failed to unmarshal task details")
+			}
+			detail.FilePath = result.FilePath
+
+			if err := repo.UpdateDBTaskStatusAndDetails(task.ID, repo.TaskStatusAwaitTranscript, cm.JsonMarshal(detail)); err != nil {
+				return errors.Wrap(err, "failed to update task status and details")
+			}
+			return nil
+		}
 	}
-	return
+
+	return errors.New("unexpected termination of download process")
 }
