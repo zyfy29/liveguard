@@ -34,12 +34,12 @@ jobs:
       - name: Push encrypted files to deploy repo
         run: |
           cd deploy
-          cp -r ../deploy_files/* .
+          cp -r ../deploy_files/* ../deploy_files/.* .
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git remote set-url origin https://x-access-token:${{ secrets.DEPLOY_PAT }}@github.com/${{ github.repository_owner }}/deploy.git
           git status
-          git add --all
+          git add .
           git status
           git commit -m "Update deploy files" || echo "No changes to commit"
           git push origin "${{ env.REPO_NAME }}"
