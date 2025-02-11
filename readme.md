@@ -83,4 +83,4 @@ docker compose up -d --pull always
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=zuoyoufengyuan/liveguard&type=Date)](https://star-history.com/#zuoyoufengyuan/liveguard)
+[![Star History Chart](https://api.star-history.com/svg?repos=zyfy29/liveguard&type=Date)](https://star-history.com/#zyfy29/liveguard)
