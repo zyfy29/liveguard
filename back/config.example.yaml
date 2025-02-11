@@ -1,10 +1,15 @@
+# 不建议更改，data_dir是容器内的路径
 app:
   back_port: 2079
   data_dir: data
 
+# 口袋48相关配置
 pocket:
+  # 口袋48的token，可以通过抓包（在请求头部的token字段）或者48tools(https://github.com/duan602728596/48tools)获取
   token: <token>
+  # 请求间隔（ms）
   interval: 500
+  # 用于请求头部，可以自行更改。deviceId留空会在启动时生成一个UUIDdeviceId。
   app_info:
     vendor: apple
     deviceId:
@@ -15,5 +20,6 @@ pocket:
     deviceName: iPhone 12 mini
     os: ios
 
+# assemblyai的api_key
 aai:
   token: <token>
