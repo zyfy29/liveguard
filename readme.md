@@ -71,10 +71,11 @@ docker compose up -d --pull always
 
 ## 贡献
 
-欢迎issues&PR！
+欢迎参与开发，若有想法请先提issues！
 
 可能的开发计划
 - 其他口袋token的获取方式
+- 将口袋client模块抽离为go library
 - 重构测试模块，不依赖db，使用测试专用token
 - 前端优化
 - 总结报告的外部投稿
