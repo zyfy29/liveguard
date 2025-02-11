@@ -73,6 +73,7 @@ func doDownloadLive(task repo.Task) (err error) {
 			}
 			detail.FilePath = result.FilePath
 
+			_ = repo.UpdateDBTaskErrorInfo(task.ID, "")
 			if err := repo.UpdateDBTaskStatusAndDetails(task.ID, repo.TaskStatusAwaitTranscript, cm.JsonMarshal(detail)); err != nil {
 				return errors.Wrap(err, "failed to update task status and details")
 			}
