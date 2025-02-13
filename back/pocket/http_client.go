@@ -18,9 +18,8 @@ type Client struct {
 	lastCallTime time.Time
 	rateLimit    time.Duration
 
-	token    string
-	appInfo  string
-	interval int
+	token   string
+	appInfo string
 }
 
 func newClient(token string, appInfo map[string]string, interval int) *Client {
@@ -28,10 +27,9 @@ func newClient(token string, appInfo map[string]string, interval int) *Client {
 	c := Client{
 		mu:           sync.Mutex{},
 		lastCallTime: time.Time{},
-		rateLimit:    0,
+		rateLimit:    time.Duration(interval) * time.Millisecond,
 		token:        token,
 		appInfo:      cm.JsonMarshal(appInfo),
-		interval:     interval,
 	}
 	return &c
 }
