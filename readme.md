@@ -29,7 +29,7 @@
 
 ### 部署仓库
 
-部署专用的文件在[zyfy29/deploy](https://github.com/zyfy29/deploy)的`liveguard`分支下。
+部署专用的文件在[zyfy29/deploy](https://github.com/zyfy29/deploy/tree/liveguard)的`liveguard`分支下。
 
 ```sh
 git clone -b liveguard https://github.com/zyfy29/deploy.git liveguard-deploy/
